@@ -7,11 +7,10 @@ from io import BytesIO
 import uuid
 import base64
 
-from mesos_proto import scheduler_pb2 as sched_pb2
-from mesos_proto import mesos_pb2 as mes_pb2
 
 
-logging.basicConfig(level=logging.INFO)
+
+logging.basicConfig(level=logging.INFO,format='%(asctime)s %(message)s')
 
 
 class VizceralScheduler:
@@ -108,7 +107,7 @@ class VizceralScheduler:
         c.setopt(pycurl.FOLLOWLOCATION, True)
         c.setopt(pycurl.HTTPHEADER, self.curl_header)
         c.setopt(pycurl.POSTFIELDS,
-                 '{"type":"SUBSCRIBE","subscribe":{"framework_info":{"user":"root","name":"Example HTTP Framework"}}}')
+                 '{"type":"SUBSCRIBE","subscribe":{"framework_info":{"user":"root","name":"Vizceral monitoring"}}}')
         c.perform()
 
     ## Callback function invoked when body data is ready
@@ -120,7 +119,7 @@ class VizceralScheduler:
         else:
             self.data_buffer=self.data_buffer+buf
 
-        logging.info("Current data buffer %s size %d", self.data_buffer,self.data_size)
+        #logging.info("Current data buffer %s size %d", self.data_buffer,self.data_size)
         if len(self.data_buffer)==self.data_size:
             data = self.data_buffer;
             self.data_buffer=''
@@ -138,16 +137,26 @@ class VizceralScheduler:
             if data['type'] == 'OFFERS':
                 self.check_offers(data['offers']['offers'])
             if data['type'] == 'UPDATE':
-                base64data = data['update']['status']['data']
+                base64data=''
+                uuid=''
+                if 'data' in data['update']['status']:
+                    base64data = data['update']['status']['data']
+                if 'uuid' in data['update']['status']:
+                    uuid  = data['update']['status']['uuid']
+
                 #logging.info("DATA DECODED %s"+base64.b64decode(base64data))
                 agent_id = data['update']['status']['agent_id']['value']
                 task_id  = data['update']['status']['task_id']['value']
-                uuid     = data['update']['status']['uuid']
+
                 state = data['update']['status']['state']
+
+                ##Only send ACK if we have uuid#
+                if uuid!='':
+                    self.send_acknowledge(uuid,agent_id,task_id)
+
                 if state=='TASK_FINISHED' or state=='TASK_KILLED' or state=='TASK_FAILED':
                     #we need to remove it
                     self.remove_task_packetbeat(agent_id)
-                    self.send_acknowledge(uuid,agent_id,task_id)
                 pass
 
 

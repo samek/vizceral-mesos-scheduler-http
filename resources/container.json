@@ -1,0 +1,46 @@
+{
+  "framework_id": {
+    "value": null
+  },
+  "type": "ACCEPT",
+  "accept": {
+    "offer_ids": [
+    ],
+    "operations": [
+      {
+        "type": "LAUNCH",
+        "launch": {
+          "task_infos": [
+            {
+              "name": null,
+              "agent_id": {
+                "value": null
+              },
+              "task_id": {
+                "value": null
+              },
+              "command": {
+                "uris": [
+
+                ],
+                "shell": false
+              },
+              "container": {
+                "docker": {
+                  "image": null,
+                  "network": "BRIDGE",
+                  "privileged": false
+                },
+                "type": "DOCKER"
+              },
+              "resources": [ ]
+            }
+          ]
+        }
+      }
+    ],
+    "filters": {
+      "refuse_seconds": 5
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "framework_id"    : {"value" : null},
+  "type"            : "ACKNOWLEDGE",
+  "acknowledge"     : {
+    "agent_id"  :  {"value" : null},
+    "task_id"   :  {"value" : null},
+    "uuid"      :  null
+  }
+}
